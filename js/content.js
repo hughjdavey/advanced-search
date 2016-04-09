@@ -38,11 +38,6 @@ chrome.runtime.onConnect.addListener(function(port) {
 // listener for messages from our popup
 chrome.runtime.onMessage.addListener(
     function(message, sender, sendResponse) {
-        console.log(message);
-        if (!message) {
-            return;
-        }
-
         // a message from find button being pressed
         if (message.type === 'search') {
             clearOldMatches();
@@ -85,10 +80,10 @@ function setCurrentMatch(sendResponse) {
 
 // clears all the highlighted matches from the last search
 function clearOldMatches() {
-    for (var i = 0; i < markedStrings.length; i++) {
-        var mark = markedStrings[i];
+    markedStrings.forEach(function(mark) {
         mark.parentNode.replaceChild(mark.firstChild, mark);
-    }
+
+    });
     markedStrings = [];
     currentMatch = 0;
 }
@@ -96,41 +91,41 @@ function clearOldMatches() {
 // visits all nodes, highlighting the search string with a <mark> tag
 // goes from: <span>contentBefore searchString contentAfter</span>
 // to: <span>contentBefore <mark class="">searchString</mark> contentAfter</span>
+// algorithm inspired by http://www.the-art-of-web.com/javascript/search-highlight/
 function highlightMatches(iterator, searchString, regex) {
     var currentNode, allNodes = [];
     while(currentNode = iterator.nextNode()) {
         allNodes.push(currentNode);
-        console.log(currentNode.nodeValue.trim() === '');
     }
 
-    for (var i = 0; i < allNodes.length; i++) {
-        var currentNode = allNodes[i];
+    allNodes.forEach(function(currentNode) {
         var textContent = currentNode.nodeValue;
         var parent = currentNode.parentNode;
+        // todo: refactor call to String#match out - perhaps get the regex match from the node iterator?
         var match = textContent.match(regex);
 
         // skips nodes of type SCRIPT and NOSCRIPT as these are not relevant
         if (parent.nodeName.includes('SCRIPT')) {
-            continue;
+            return;
         }
 
         var start = textContent.indexOf(match);         // start index of search string
         var end = start + match[0].length;              // end index of search string
 
         // create text node for the content before the search string, and replace the current node with it
-        var before = document.createTextNode(textContent.substring(0, start));
-        parent.replaceChild(before, currentNode);
+        var contentBefore = document.createTextNode(textContent.substring(0, start));
+        parent.replaceChild(contentBefore, currentNode);
 
-        // create a <mark> tag and place the search string inside it, inserting in the parent after the before node
+        // create a <mark> tag and place the search string inside it, inserting in the parent after the contentBefore node
         var mark = document.createElement('mark');
         mark.appendChild(document.createTextNode(match[0]));
-        parent.insertBefore(mark, before.nextSibling);
+        parent.insertBefore(mark, contentBefore.nextSibling);
         markedStrings.push(mark);                                   // put <mark> node in our array
 
         // create text node for the content before the search string, inserting in the parent after the <mark> node
-        var after = document.createTextNode(textContent.substring(end));
-        parent.insertBefore(after, mark.nextSibling);
-    }
+        var contentAfter = document.createTextNode(textContent.substring(end));
+        parent.insertBefore(contentAfter, mark.nextSibling);
+    });
 }
 
 // returns the appropriate regex depending on which options have been checked
