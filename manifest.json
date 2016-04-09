@@ -1,0 +1,51 @@
+{
+    "manifest_version": 2,
+    "name": "Advanced Find",
+    "description": "A more advanced find on page tool",
+    "version": "1.0",
+    "offline_enabled": true,
+    "author": "hughjdavey@github.com",
+
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "<all_urls>"
+    ],
+
+    "content_scripts": [{
+        "matches": ["<all_urls>"],
+        "js": ["js/content.js"],
+        "css": ["css/style.css"]
+    }],
+
+    "icons" : {
+        "256": "resources/advanced-find.png"
+    },
+
+    "browser_action": {
+        "default-title": "Advanced Find",
+        "default_popup": "html/search-box.html",
+        "default_icon": "resources/advanced-find.png"
+    },
+
+    "commands": {
+        "previous": {
+            "suggested_key": {
+                "default": "Ctrl+Left"
+            },
+            "description": "Go to previous match"
+        },
+        "next": {
+            "suggested_key": {
+                "default": "Ctrl+Right"
+            },
+            "description": "Go to next match"
+        },
+        "_execute_browser_action": {
+            "suggested_key": {
+                "default": "Ctrl+Shift+F",
+                "mac": "Command+Shift+F"
+            }
+        }
+    }
+}

@@ -1,0 +1,57 @@
+<!--
+    Copyright 2016 Hugh Davey
+
+    This file is part of Advanced Search.
+
+    Advanced Search is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Advanced Search is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Advanced Search.  If not, see <http://www.gnu.org/licenses/>.
+-->
+
+<!doctype html>
+<html>
+
+    <head>
+        <script src=../js/search.js></script>
+        <link rel="stylesheet" type="text/css" href="../css/style.css">
+    </head>
+
+    <body>
+        <div>
+            <div class="align-left-heading">
+                <h4>Advanced Search</h4>
+            </div>
+
+            <div class="align-right-heading">
+                <small><a href="about.html" title="About">
+                    About
+                </a></small>
+            </div>
+        </div>
+
+        <form id="find-on-page">
+            <input type="text" id="search-string">
+            <br><br>
+            <input id="match-case" type="checkbox" > Match Case
+            <br>
+            <input id="whole-words" type="checkbox" > Whole Words
+            <br><br>
+            <button id="search-button" type="submit">Find</button>
+
+            <div class="match-count" id='matches-display'>
+                <i id='xxxx'>0 of 0 matches</i>
+            </div>
+        </form>
+
+    </body>
+
+</html>
