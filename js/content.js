@@ -58,8 +58,12 @@ chrome.runtime.onMessage.addListener(
                 }
             );
 
-            highlightMatches(nodeIterator, message.text, regex);
-            setCurrentMatch(sendResponse);
+            // only bother with the rest if at least one match was found
+            if ( highlightMatches(nodeIterator, message.text, regex) ) {
+                setCurrentMatch();
+                // invoke callback in search.js to display total number of matches to the user
+                sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
+            }
         }
         else if (message.type === 'move') {
             moveHighlightedMatch(message.cmd);
@@ -69,12 +73,18 @@ chrome.runtime.onMessage.addListener(
     }
 );
 
-// after all matches have been highlighted we set the first one as the current match
-function setCurrentMatch(sendResponse) {
+// set the current match to a special class to highlight it as current (orange)
+// goes from: <span>contentBefore <mark class="">searchString</mark> contentAfter</span>
+// to : <span>contentBefore <mark class="current_match">searchString</mark> contentAfter</span>
+function setCurrentMatch() {
     if (markedStrings.length > 0) {
-        markedStrings[0].className = 'current_match';
-        // invoke callback in search.js to display total number of matches to the user
-        sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
+        var currentMark = markedStrings[currentMatch];
+        currentMark.className = 'current_match';
+
+        if (!isVisible(currentMark)) {
+            console.log('not visible');
+            scrollToCurrentMatch(currentMark);
+        }
     }
 }
 
@@ -96,6 +106,10 @@ function highlightMatches(iterator, searchString, regex) {
     var currentNode, allNodes = [];
     while(currentNode = iterator.nextNode()) {
         allNodes.push(currentNode);
+    }
+
+    if (allNodes.length === 0) {
+        return false;
     }
 
     allNodes.forEach(function(currentNode) {
@@ -126,6 +140,7 @@ function highlightMatches(iterator, searchString, regex) {
         var contentAfter = document.createTextNode(textContent.substring(end));
         parent.insertBefore(contentAfter, mark.nextSibling);
     });
+    return true;
 }
 
 // returns the appropriate regex depending on which options have been checked
@@ -145,15 +160,10 @@ function getRegex(textToMatch, options) {
 }
 
 // moves highlighted match forward or back, rewriting class names to change colour
-// todo: scroll page to jump to next match if it is out of view
 function moveHighlightedMatch(direction) {
     markedStrings[currentMatch].className = '';
     currentMatch = direction === 'next' ? getNextMatch() : getPreviousMatch();
-
-    // set a custom class so it becomes orange
-    // goes from: <span>contentBefore <mark class="">searchString</mark> contentAfter</span>
-    // to : <span>contentBefore <mark class="current_match">searchString</mark> contentAfter</span>
-    markedStrings[currentMatch].className = 'current_match';
+    setCurrentMatch();
 }
 
 // return index of next match, wrapping around to the start of the array if needed
@@ -166,4 +176,27 @@ function getNextMatch() {
 function getPreviousMatch() {
     var previousMatch = currentMatch - 1;
     return previousMatch === -1 ? markedStrings.length - 1 : previousMatch;
+}
+
+function scrollToCurrentMatch(currentMark) {
+    var y_position = getCurrentMatchPosition(currentMark);
+    // subtract 25 from y_position so there is a bit of 'padding' and the text is easily visible on screen
+    window.scrollTo(0, y_position - 25);
+}
+
+function getCurrentMatchPosition(currentMark) {
+    var curtop = 0;
+    if (currentMark.offsetParent) {
+        do {
+            curtop += currentMark.offsetTop;
+        } while (currentMark = currentMark.offsetParent);
+        console.log(curtop);
+        return [curtop];
+    }
+}
+
+function isVisible(match) {
+  var rect = match.getBoundingClientRect();
+  var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
+  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
 }
