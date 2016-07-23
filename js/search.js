@@ -120,6 +120,7 @@ function updateMatchesDisplay(response) {
 function onRegexChange() {
     matchCase = document.getElementById('match-case').checked;
     wholeWords = document.getElementById('whole-words').checked;
+    onInputChange();
 }
 
 function onInputChange() {
