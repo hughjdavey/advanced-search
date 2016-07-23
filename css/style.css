@@ -35,7 +35,8 @@ p {
 
 div.match-count {
 	float: right;
-    margin-top: 4px;
+    margin-top: 10px;
+    margin-bottom: 8px;
 }
 
 .current_match {
