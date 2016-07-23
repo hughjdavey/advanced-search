@@ -110,7 +110,7 @@ function updateMatchesDisplay(response) {
     if (Object.keys(response).length == 2) {
         matchesString[2] = totalMatches;            // update total matches if we get a response with 2 attrs (i.e. a current and a total)
     }
-    matchesString[0] = currentMatch + 1;            // always update current match (add 1 as it's an array index)
+    matchesString[0] = totalMatches == 0 ? 0 : currentMatch + 1;            // add 1 as it's an array index, but not if total is 0 (or it would read '1 of 0 matches')
 
     matchesDisplay.textContent = matchesString.join(' ');
     matchesDisplay.style.fontStyle = 'italic';
@@ -131,7 +131,7 @@ function onInputChange() {
     else {
         // when the search box has become empty we want to clear old matches
         clearOldMatches();
-        updateMatchValues( { 'match-count': 0, 'current-match': -1 } );
+        updateMatchValues( { 'match-count': 0, 'current-match': 0 } );
     }
 }
 

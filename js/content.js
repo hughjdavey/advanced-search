@@ -60,9 +60,10 @@ chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
             // only bother with the rest if at least one match was found
             if ( highlightMatches(nodeIterator, message.text, regex) ) {
                 setCurrentMatch();
-                // invoke callback in search.js to display total number of matches to the user
-                sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
             }
+            // invoke callback in search.js to display total number of matches to the user
+            sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
+
         }
         else if (message.type === 'move') {
             moveHighlightedMatch(message.cmd);
