@@ -9,3 +9,5 @@ Known Issues:
 * Search will match hidden elements such as those in unexpanded dropdowns. This causes the total matches count to be inaccurate as well as giving the impression that scrolling to the current match is not working.
 * Regex choice is limited to two options and not customizable.
 * Next and Previous buttons would be nice to have alongside the existing keyboard shortcuts.
+* Search results are wiped if popup loses focus - maybe ought to be more like Chrome inbuilt finder and persist them so user can click off and scroll freely.
+* Marking locations of results in the scrollbar like Chrome inbuilt finder would be helpful in this regard.
