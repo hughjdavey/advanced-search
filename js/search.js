@@ -64,20 +64,27 @@ function onFindPressed(event) {
         return;
     }
 
-    var searchParams = {
+    var searchParams = createSearch(searchString);
+    doSearch(searchParams);
+
+    // stop submission event here so form fields are not cleared/reset
+    event.preventDefault();
+}
+
+// send search parameters to content.js
+function doSearch(searchParams) {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, searchParams, updateMatchValues);
+    });
+}
+
+function createSearch(searchString) {
+    return {
         'type': 'search',
         'text': searchString,
         'matchCase': matchCase,
         'wholeWords': wholeWords
     }
-
-    // send search parameters to content.js
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
-        chrome.tabs.sendMessage(tabs[0].id, searchParams, updateMatchValues);
-    });
-
-    // stop submission event here so form fields are not cleared/reset
-    event.preventDefault();
 }
 
 // handles responses from content.js, containing latest current match and possibly a new total matches
@@ -96,15 +103,14 @@ function updateMatchesDisplay(response) {
     // split on spaces to turn 'x of y matches' into a 4-element array
     // the filter is needed as the array comes out full of empty strings and newlines
     // array should end up looking like ['x', 'of', 'y', 'matches']
-    var matchesString = matchesDisplay.textContent.split(' ')
-    .filter(function(elem) {
+    var matchesString = matchesDisplay.textContent.split(' ').filter( elem => {
         return elem !== '' && elem !== '\n';
     });
 
     if (Object.keys(response).length == 2) {
         matchesString[2] = totalMatches;            // update total matches if we get a response with 2 attrs (i.e. a current and a total)
     }
-    matchesString[0] = currentMatch + 1;            // always update current match
+    matchesString[0] = currentMatch + 1;            // always update current match (add 1 as it's an array index)
 
     matchesDisplay.textContent = matchesString.join(' ');
     matchesDisplay.style.fontStyle = 'italic';
@@ -116,10 +122,30 @@ function onRegexChange() {
     wholeWords = document.getElementById('whole-words').checked;
 }
 
+function onInputChange() {
+    var searchString = document.getElementById('search-string').value;
+    if (searchString) {
+        var searchParams = createSearch(searchString);
+        doSearch(searchParams);
+    }
+    else {
+        // when the search box has become empty we want to clear old matches
+        clearOldMatches();
+        updateMatchValues( { 'match-count': 0, 'current-match': -1 } );
+    }
+}
+
+function clearOldMatches() {
+    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+        chrome.tabs.sendMessage(tabs[0].id, { 'type' : 'clear' });
+    });
+}
+
 // set up event listeners and put cursor in input box
 function initialize() {
     document.querySelector('#match-case').addEventListener('change', onRegexChange);
     document.querySelector('#whole-words').addEventListener('change', onRegexChange);
+    document.querySelector('#search-string').addEventListener('input', onInputChange);
     document.getElementById('find-on-page').addEventListener('submit', onFindPressed);
 
     var searchBox = document.getElementById('search-string');

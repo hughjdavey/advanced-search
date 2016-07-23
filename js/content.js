@@ -70,6 +70,9 @@ chrome.runtime.onMessage.addListener(
             // invoke callback in search.js to display current match number to the user
             sendResponse( { 'current-match': currentMatch } );
         }
+        else if (message.type === 'clear') {
+            clearOldMatches();
+        }
     }
 );
 
@@ -92,10 +95,17 @@ function setCurrentMatch() {
 function clearOldMatches() {
     markedStrings.forEach(function(mark) {
         mark.parentNode.replaceChild(mark.firstChild, mark);
-
     });
     markedStrings = [];
     currentMatch = 0;
+
+    // call Node#normalize to join the text nodes split apart by the previous search
+    // after the <mark> tags are removed, the search string is still in a separate text node
+    // e.g. consider a search for 'dev' on a page containing the node <p>"The developer"</p>
+    // after mark tags have been removed the node looks like: <p>"The " "dev" "eloper"</p>
+    // and a search for 'devel' will now fail as no text node holds this string
+    // after a call to normalize the node looks like: <p>"The developer"</p>
+    document.body.normalize();
 }
 
 // visits all nodes, highlighting the search string with a <mark> tag
@@ -109,6 +119,7 @@ function highlightMatches(iterator, searchString, regex) {
     }
 
     if (allNodes.length === 0) {
+        console.log('nooooooooooooooo');
         return false;
     }
 
@@ -190,7 +201,6 @@ function getCurrentMatchPosition(currentMark) {
         do {
             curtop += currentMark.offsetTop;
         } while (currentMark = currentMark.offsetParent);
-        console.log(curtop);
         return [curtop];
     }
 }
