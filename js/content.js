@@ -205,8 +205,19 @@ function getCurrentMatchPosition(currentMark) {
     }
 }
 
-function isVisible(match) {
-  var rect = match.getBoundingClientRect();
-  var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+function isVisible(el) {
+    var top    = el.offsetTop;
+    var left   = el.offsetLeft;
+    var width  = el.offsetWidth;
+    var height = el.offsetHeight;
+
+    while (el.offsetParent) {
+        el = el.offsetParent;
+        top += el.offsetTop;
+        left += el.offsetLeft;
+    }
+
+    return top >= window.pageYOffset && left >= window.pageXOffset &&
+        (top + height) <= (window.pageYOffset + window.innerHeight) &&
+        (left + width) <= (window.pageXOffset + window.innerWidth);
 }
