@@ -83,10 +83,7 @@ function setCurrentMatch() {
     if (markedStrings.length > 0) {
         var currentMark = markedStrings[currentMatch];
         currentMark.className = 'current_match';
-
-        if (!isVisible(currentMark)) {
-            scrollToCurrentMatch(currentMark);
-        }
+        scrollToCurrentMatch(currentMark);
     }
 }
 
@@ -187,25 +184,15 @@ function getPreviousMatch() {
     return previousMatch === -1 ? markedStrings.length - 1 : previousMatch;
 }
 
+// put a method onto elements that returns the top of the element
+// taken from http://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment && http://jsfiddle.net/ThinkingStiff/MJ69d/
+Element.prototype.documentOffsetTop = function () {
+    return this.offsetTop + ( this.offsetParent ? this.offsetParent.documentOffsetTop() : 0 );
+};
+
+// gets the top of the elmement we want to move to and subtracts hal;f of the window height
+// taken from http://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment && http://jsfiddle.net/ThinkingStiff/MJ69d/
 function scrollToCurrentMatch(currentMark) {
-    var y_position = getCurrentMatchPosition(currentMark);
-    // subtract 25 from y_position so there is a bit of 'padding' and the text is easily visible on screen
-    window.scrollTo(0, y_position - 25);
-}
-
-function getCurrentMatchPosition(currentMark) {
-    var curtop = 0;
-    if (currentMark.offsetParent) {
-        do {
-            curtop += currentMark.offsetTop;
-        } while (currentMark = currentMark.offsetParent);
-        return [curtop];
-    }
-}
-
-
-function isVisible(match) {
-  var rect = match.getBoundingClientRect();
-  var viewHeight = Math.max(document.documentElement.clientHeight, window.innerHeight);
-  return !(rect.bottom < 0 || rect.top - viewHeight >= 0);
+    var top = document.querySelectorAll('.current_match')[0].documentOffsetTop() - (window.innerHeight / 2 );
+    window.scrollTo(0, top);
 }
