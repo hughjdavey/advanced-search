@@ -85,7 +85,6 @@ function setCurrentMatch() {
         currentMark.className = 'current_match';
 
         if (!isVisible(currentMark)) {
-            console.log('not visible');
             scrollToCurrentMatch(currentMark);
         }
     }
@@ -119,7 +118,6 @@ function highlightMatches(iterator, searchString, regex) {
     }
 
     if (allNodes.length === 0) {
-        console.log('nooooooooooooooo');
         return false;
     }
 
