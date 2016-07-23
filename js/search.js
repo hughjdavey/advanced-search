@@ -32,7 +32,7 @@ chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     var port = chrome.tabs.connect(tabs[0].id, {name: 'disconnect-sender'});
 });
 
-// listen for keyboard shortcuts we defined as commands int the manifest
+// listen for keyboard shortcuts we defined as commands in the manifest
 chrome.commands.onCommand.addListener( command => {
     if (command) {
         onCommand(command);
@@ -119,6 +119,7 @@ function onRegexChange() {
     onInputChange();
 }
 
+// called whenever content of the search box changes to launch a fresh search
 function onInputChange() {
     var searchString = document.getElementById('search-string').value;
     if (searchString) {
@@ -131,16 +132,30 @@ function onInputChange() {
     }
 }
 
+// send a 'clear' message to content.js so it clears old matches
 function clearOldMatches() {
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, { 'type' : 'clear' });
     });
 }
 
+// used to make the ENTER key toggle the regex checkboxes on and off as only SPACE does this by default
+function detectEnterKey(event) {
+    if (event.key === 'Enter') {
+        event.target.click();
+    }
+}
+
 // set up event listeners and put cursor in input box
 function initialize() {
-    document.querySelector('#match-case').addEventListener('change', onRegexChange);
-    document.querySelector('#whole-words').addEventListener('change', onRegexChange);
+    var matchCaseCheckbox = document.querySelector('#match-case');
+    matchCaseCheckbox.addEventListener('keydown', detectEnterKey);
+    matchCaseCheckbox.addEventListener('change', onRegexChange);
+
+    var wholeWordsCheckbox = document.querySelector('#whole-words');
+    wholeWordsCheckbox.addEventListener('keydown', detectEnterKey);
+    wholeWordsCheckbox.addEventListener('change', onRegexChange);
+
     document.querySelector('#search-string').addEventListener('input', onInputChange);
     document.getElementById('find-on-page').addEventListener('submit', onFindPressed);
 

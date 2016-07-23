@@ -37,44 +37,44 @@ chrome.runtime.onConnect.addListener( port => {
 
 // listener for messages from our popup
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
-        // a message from find button being pressed
-        if (message.type === 'search') {
-            clearOldMatches();
-            matchCase = message.matchCase;
-            wholeWords = message.wholeWords;
+    // a message from find button being pressed
+    if (message.type === 'search') {
+        clearOldMatches();
+        matchCase = message.matchCase;
+        wholeWords = message.wholeWords;
 
-            var searchOpts = {
-                'matchCase': matchCase,
-                'wholeWords': wholeWords
+        var searchOpts = {
+            'matchCase': matchCase,
+            'wholeWords': wholeWords
+        }
+
+        var regex = getRegex(message.text, searchOpts);
+
+        var nodeIterator = document.createNodeIterator(
+            document.body,
+            NodeFilter.SHOW_TEXT,
+            node => {
+                return node.nodeValue.match(regex) !== null ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
             }
-            var regex = getRegex(message.text, searchOpts);
+        );
 
-            var nodeIterator = document.createNodeIterator(
-                document.body,
-                NodeFilter.SHOW_TEXT,
-                node => {
-                    return node.nodeValue.match(regex) !== null ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
-                }
-            );
+        // only call setCurrentMatch if at least one match was found
+        if ( highlightMatches(nodeIterator, message.text, regex) ) {
+            setCurrentMatch();
+        }
+        // invoke callback in search.js to display total number of matches to the user
+        sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
 
-            // only bother with the rest if at least one match was found
-            if ( highlightMatches(nodeIterator, message.text, regex) ) {
-                setCurrentMatch();
-            }
-            // invoke callback in search.js to display total number of matches to the user
-            sendResponse( { 'match-count': markedStrings.length, 'current-match': currentMatch } );
-
-        }
-        else if (message.type === 'move') {
-            moveHighlightedMatch(message.cmd);
-            // invoke callback in search.js to display current match number to the user
-            sendResponse( { 'current-match': currentMatch } );
-        }
-        else if (message.type === 'clear') {
-            clearOldMatches();
-        }
     }
-);
+    else if (message.type === 'move') {
+        moveHighlightedMatch(message.cmd);
+        // invoke callback in search.js to display current match number to the user
+        sendResponse( { 'current-match': currentMatch } );
+    }
+    else if (message.type === 'clear') {
+        clearOldMatches();
+    }
+});
 
 // set the current match to a special class to highlight it as current (orange)
 // goes from: <span>contentBefore <mark class="">searchString</mark> contentAfter</span>
