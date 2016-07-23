@@ -27,17 +27,16 @@ var port = undefined;
 
 // listens for a port from the popup and adds a listener for when it disconnects
 // (i.e. the popup is closed) so we can clear any highlights on the page
-chrome.runtime.onConnect.addListener(function(port) {
+chrome.runtime.onConnect.addListener( port => {
     if (port.name == "disconnect-sender") {
-        port.onDisconnect.addListener(function() {
+        port.onDisconnect.addListener( () => {
             clearOldMatches();
         });
     }
 });
 
 // listener for messages from our popup
-chrome.runtime.onMessage.addListener(
-    function(message, sender, sendResponse) {
+chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
         // a message from find button being pressed
         if (message.type === 'search') {
             clearOldMatches();
@@ -53,7 +52,7 @@ chrome.runtime.onMessage.addListener(
             var nodeIterator = document.createNodeIterator(
                 document.body,
                 NodeFilter.SHOW_TEXT,
-                function(node) {
+                node => {
                     return node.nodeValue.match(regex) !== null ? NodeFilter.FILTER_ACCEPT : NodeFilter.FILTER_REJECT;
                 }
             );
@@ -93,7 +92,7 @@ function setCurrentMatch() {
 
 // clears all the highlighted matches from the last search
 function clearOldMatches() {
-    markedStrings.forEach(function(mark) {
+    markedStrings.forEach( mark => {
         mark.parentNode.replaceChild(mark.firstChild, mark);
     });
     markedStrings = [];
@@ -123,7 +122,7 @@ function highlightMatches(iterator, searchString, regex) {
         return false;
     }
 
-    allNodes.forEach(function(currentNode) {
+    allNodes.forEach( currentNode => {
         var textContent = currentNode.nodeValue;
         var parent = currentNode.parentNode;
         // todo: refactor call to String#match out - perhaps get the regex match from the node iterator?

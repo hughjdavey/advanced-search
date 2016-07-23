@@ -27,19 +27,19 @@ var totalMatches = 0;
 
 // passes a connection to content.js, which listens for us diconnecting
 // (i.e. closing) so it knows to clear any highlights on the page
-chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+chrome.tabs.query({active: true, currentWindow: true}, tabs => {
     var port = chrome.tabs.connect(tabs[0].id, {name: 'disconnect-sender'});
 });
 
 // listen for keyboard shortcuts we defined as commands int the manifest
-chrome.commands.onCommand.addListener(function(command) {
+chrome.commands.onCommand.addListener( command => {
     if (command) {
         onCommand(command);
     }
 });
 
 // listen for when DOM is loaded so we can initialize our popup box
-document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', () => {
     initialize();
 });
 
@@ -51,7 +51,7 @@ function onCommand(command) {
     }
 
     // send forward or back command to content.js
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, moveCommand, updateMatchValues);
     });
 }
@@ -73,7 +73,7 @@ function onFindPressed(event) {
 
 // send search parameters to content.js
 function doSearch(searchParams) {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, searchParams, updateMatchValues);
     });
 }
@@ -136,7 +136,7 @@ function onInputChange() {
 }
 
 function clearOldMatches() {
-    chrome.tabs.query({active: true, currentWindow: true}, function(tabs) {
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, { 'type' : 'clear' });
     });
 }
