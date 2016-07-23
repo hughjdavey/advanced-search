@@ -103,8 +103,13 @@ var updateMatchValues = function(response) {
 
 // updates the 'x of y matches' display when current or total matches changes
 function updateMatchesDisplay(response) {
-    // add 1 to currentMatch as it is an array index
-    matchesDisplay.textContent = `${currentMatch + 1} of ${totalMatches} matches`;
+    if (currentMatch === 0 && totalMatches == 0) {
+        matchesDisplay.textContent = 'No matches';
+    }
+    else {
+        // add 1 to currentMatch as it is an array index
+        matchesDisplay.textContent = `${currentMatch + 1} of ${totalMatches} matches`;
+    }
 }
 
 // update our regex booleans when checkboxes are modified
@@ -123,8 +128,6 @@ function onInputChange() {
     else {
         // when the search box has become empty we want to clear old matches
         clearOldMatches();
-        var matchesDisplay = document.getElementById('matches-display');
-        matchesDisplay.textContent = 'No matches';
     }
 }
 
