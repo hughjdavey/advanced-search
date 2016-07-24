@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // handle keyboard shortcuts by passing them to content.js
 function onCommand(command) {
+    console.log(command);
     var moveCommand = {
         'type': 'move',
         'cmd': command
@@ -146,6 +147,11 @@ function detectEnterKey(event) {
     }
 }
 
+// handles clicking the buttons for moving to next or previous match
+function onMovePressed(event) {
+    onCommand(event.target.id);
+}
+
 // set up event listeners and put cursor in input box
 function initialize() {
     var matchCaseCheckbox = document.querySelector('#match-case');
@@ -161,6 +167,9 @@ function initialize() {
 
     var searchBox = document.getElementById('search-string');
     searchBox.focus();
+
+    document.getElementById('next').addEventListener('click', onMovePressed);
+    document.getElementById('previous').addEventListener('click', onMovePressed);
 
     matchesDisplay = document.getElementById('matches-display');
     matchesDisplay.style.fontStyle = 'italic';
