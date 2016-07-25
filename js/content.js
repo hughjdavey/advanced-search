@@ -24,16 +24,6 @@ var currentMatch = 0;
 var matchCase = false;
 var wholeWords = false;
 
-// listens for a port from the popup and adds a listener for when it disconnects
-// (i.e. the popup is closed) so we can clear any highlights on the page
-chrome.runtime.onConnect.addListener( port => {
-    if (port.name == "disconnect-sender") {
-        port.onDisconnect.addListener( () => {
-            clearOldMatches();
-        });
-    }
-});
-
 // listener for messages from our popup
 chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
     // a message from find button being pressed

@@ -27,13 +27,6 @@ var totalMatches = 0;
 var matchesDisplay = undefined;
 var searchBox = undefined;
 
-// passes a connection to content.js, which listens for us disconnecting
-// (i.e. closing) so it knows to clear any highlights on the page
-// TODO maybe leave highlights (and highlights on scrollbar) displayed when popup is closed, and clear when it is reopened for a new search
-//chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-//    var port = chrome.tabs.connect(tabs[0].id, {name: 'disconnect-sender'});
-//});
-
 // listen for keyboard shortcuts we defined as commands in the manifest
 chrome.commands.onCommand.addListener( command => {
     if (command) {
