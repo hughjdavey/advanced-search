@@ -178,4 +178,7 @@ function initialize() {
 
     matchesDisplay = document.getElementById('matches-display');
     matchesDisplay.style.fontStyle = 'italic';
+
+    /* clear old matches when we begin a new search */
+    clearOldMatches();
 }
