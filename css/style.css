@@ -53,3 +53,7 @@ button.text-button {
     font-size: 30px;
     margin: 0px;
 }
+
+div.align-right {
+    float: right;
+}
