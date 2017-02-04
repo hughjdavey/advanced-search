@@ -5,8 +5,7 @@ Searches are performed as you type, and there are regex options to further filte
 
 CTRL + 🠆 to go to next match; CTRL + 🠄 to go to previous.
 
-Known Issues:
-* Search will match hidden elements such as those in unexpanded dropdowns. This causes the total matches count to be inaccurate as well as giving the impression that scrolling to the current match is not working.
+#####Known Issues:
 * Regex choice is limited to two options and not customizable.
 * Search results are wiped if popup loses focus - maybe ought to be more like Chrome inbuilt finder and persist them so user can click off and scroll freely.
 * Marking locations of results in the scrollbar like Chrome inbuilt finder would be helpful in this regard.
