@@ -42,3 +42,14 @@ div.match-count {
 .current_match {
 	background-color: #ff9632;
 }
+
+div.button-bar {
+    margin-top: 10px;
+}
+
+button.text-button {
+    background: none;
+    border: none;
+    font-size: 30px;
+    margin: 0px;
+}

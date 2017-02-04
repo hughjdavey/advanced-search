@@ -120,14 +120,12 @@ function highlightMatches(iterator, searchString, regex) {
     allNodes.forEach( currentNode => {
         var textContent = currentNode.nodeValue;
         var parent = currentNode.parentNode;
-        // todo: refactor call to String#match out - perhaps get the regex match from the node iterator?
-        var match = textContent.match(regex);
-
-        // skips nodes of type SCRIPT and NOSCRIPT as these are not relevant
-        if (parent.nodeName.includes('SCRIPT')) {
+        if (shouldNotHighlight(parent)) {
             return;
         }
 
+        // todo: refactor call to String#match out - perhaps get the regex match from the node iterator?
+        var match = textContent.match(regex);
         var start = textContent.indexOf(match);         // start index of search string
         var end = start + match[0].length;              // end index of search string
 
@@ -146,6 +144,25 @@ function highlightMatches(iterator, searchString, regex) {
         parent.insertBefore(contentAfter, mark.nextSibling);
     });
     return true;
+}
+
+// do not highlight script/noscript tags or nodes which are not visible due to one of their parents not being visible
+// this latter filter stops text in unexpanded dropdowns or popovers being highlighted
+function shouldNotHighlight(node) {
+    var script = node.nodeName.includes('SCRIPT');
+    var hidden = anyParent(node, parent => parent.nodeType === Node.ELEMENT_NODE && window.getComputedStyle(parent).display === 'none');
+    return script || hidden;
+}
+
+// gets all parents of a given node and returns true if any of them matches a predicate
+function anyParent(node, nodePredicate) {
+    var parents = [];
+    while (node) {
+        parents.unshift(node);
+        node = node.parentNode;
+    }
+
+    return parents.some(nodePredicate);
 }
 
 // returns the appropriate regex depending on which options have been checked
