@@ -19,10 +19,10 @@
 
 'use strict';
 
-var markedStrings = [];
-var currentMatch = 0;
-var matchCase = false;
-var wholeWords = false;
+let markedStrings = [];
+let currentMatch = 0;
+let matchCase = false;
+let wholeWords = false;
 
 // listens for a port from the popup and adds a listener for when it disconnects
 // (i.e. the popup is closed) so we can clear any highlights on the page
@@ -42,14 +42,14 @@ chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
         matchCase = message.matchCase;
         wholeWords = message.wholeWords;
 
-        var searchOpts = {
+        let searchOpts = {
             'matchCase': matchCase,
             'wholeWords': wholeWords
-        }
+        };
 
-        var regex = getRegex(message.text, searchOpts);
+        let regex = getRegex(message.text, searchOpts);
 
-        var nodeIterator = document.createNodeIterator(
+        let nodeIterator = document.createNodeIterator(
             document.body,
             NodeFilter.SHOW_TEXT,
             node => {
@@ -80,7 +80,7 @@ chrome.runtime.onMessage.addListener( (message, sender, sendResponse) => {
 // to : <span>contentBefore <mark class="current_match">searchString</mark> contentAfter</span>
 function setCurrentMatch() {
     if (markedStrings.length > 0) {
-        var currentMark = markedStrings[currentMatch];
+        let currentMark = markedStrings[currentMatch];
         currentMark.className = 'current_match';
         scrollToCurrentMatch();
     }
@@ -108,7 +108,7 @@ function clearOldMatches() {
 // to: <span>contentBefore <mark class="">searchString</mark> contentAfter</span>
 // algorithm inspired by http://www.the-art-of-web.com/javascript/search-highlight/
 function highlightMatches(iterator, searchString, regex) {
-    var currentNode, allNodes = [];
+    let currentNode, allNodes = [];
     while(currentNode = iterator.nextNode()) {
         allNodes.push(currentNode);
     }
@@ -118,29 +118,29 @@ function highlightMatches(iterator, searchString, regex) {
     }
 
     allNodes.forEach( currentNode => {
-        var textContent = currentNode.nodeValue;
-        var parent = currentNode.parentNode;
+        let textContent = currentNode.nodeValue;
+        let parent = currentNode.parentNode;
         if (shouldNotHighlight(parent)) {
             return;
         }
 
         // todo: refactor call to String#match out - perhaps get the regex match from the node iterator?
-        var match = textContent.match(regex);
-        var start = textContent.indexOf(match);         // start index of search string
-        var end = start + match[0].length;              // end index of search string
+        let match = textContent.match(regex);
+        let start = textContent.indexOf(match);         // start index of search string
+        let end = start + match[0].length;              // end index of search string
 
         // create text node for the content before the search string, and replace the current node with it
-        var contentBefore = document.createTextNode(textContent.substring(0, start));
+        let contentBefore = document.createTextNode(textContent.substring(0, start));
         parent.replaceChild(contentBefore, currentNode);
 
         // create a <mark> tag and place the search string inside it, inserting in the parent after the contentBefore node
-        var mark = document.createElement('mark');
+        let mark = document.createElement('mark');
         mark.appendChild(document.createTextNode(match[0]));
         parent.insertBefore(mark, contentBefore.nextSibling);
         markedStrings.push(mark);                                   // put <mark> node in our array
 
         // create text node for the content before the search string, inserting in the parent after the <mark> node
-        var contentAfter = document.createTextNode(textContent.substring(end));
+        let contentAfter = document.createTextNode(textContent.substring(end));
         parent.insertBefore(contentAfter, mark.nextSibling);
     });
     return true;
@@ -149,14 +149,14 @@ function highlightMatches(iterator, searchString, regex) {
 // do not highlight script/noscript tags or nodes which are not visible due to one of their parents not being visible
 // this latter filter stops text in unexpanded dropdowns or popovers being highlighted
 function shouldNotHighlight(node) {
-    var script = node.nodeName.includes('SCRIPT');
-    var hidden = anyParent(node, parent => parent.nodeType === Node.ELEMENT_NODE && window.getComputedStyle(parent).display === 'none');
+    let script = node.nodeName.includes('SCRIPT');
+    let hidden = anyParent(node, parent => parent.nodeType === Node.ELEMENT_NODE && window.getComputedStyle(parent).display === 'none');
     return script || hidden;
 }
 
 // gets all parents of a given node and returns true if any of them matches a predicate
 function anyParent(node, nodePredicate) {
-    var parents = [];
+    let parents = [];
     while (node) {
         parents.unshift(node);
         node = node.parentNode;
@@ -168,16 +168,16 @@ function anyParent(node, nodePredicate) {
 // returns the appropriate regex depending on which options have been checked
 function getRegex(textToMatch, options) {
     if (options.wholeWords && options.matchCase) {
-        return RegExp('(?:^|\\b)(' + textToMatch + ')(?=\\b|$)', 'g');
+        return new RegExp('(?:^|\\b)(' + textToMatch + ')(?=\\b|$)', 'g');
     }
     else if (options.wholeWords) {
-        return RegExp('(?:^|\\b)(' + textToMatch + ')(?=\\b|$)', 'gi');
+        return new RegExp('(?:^|\\b)(' + textToMatch + ')(?=\\b|$)', 'gi');
     }
     else if (options.matchCase) {
-        return RegExp(textToMatch);
+        return new RegExp(textToMatch);
     }
     else {
-        return RegExp(textToMatch, 'i');
+        return new RegExp(textToMatch, 'i');
     }
 }
 
@@ -190,13 +190,13 @@ function moveHighlightedMatch(direction) {
 
 // return index of next match, wrapping around to the start of the array if needed
 function getNextMatch() {
-    var nextMatch = currentMatch + 1;
+    let nextMatch = currentMatch + 1;
     return nextMatch === markedStrings.length ? 0 : nextMatch;
 }
 
 // return index of previous, wrapping around to the end of the array if needed
 function getPreviousMatch() {
-    var previousMatch = currentMatch - 1;
+    let previousMatch = currentMatch - 1;
     return previousMatch === -1 ? markedStrings.length - 1 : previousMatch;
 }
 
@@ -209,6 +209,6 @@ Element.prototype.documentOffsetTop = function () {
 // gets the top of the element we want to move to and subtracts half of the window height
 // taken from http://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment && http://jsfiddle.net/ThinkingStiff/MJ69d/
 function scrollToCurrentMatch() {
-    var top = document.querySelectorAll('.current_match')[0].documentOffsetTop() - (window.innerHeight / 2 );
+    let top = document.querySelectorAll('.current_match')[0].documentOffsetTop() - (window.innerHeight / 2 );
     window.scrollTo(0, top);
 }

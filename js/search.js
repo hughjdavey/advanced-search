@@ -19,18 +19,18 @@
 
 'use strict';
 
-var matchCase = false;
-var wholeWords = false;
-var searchString = '';
-var currentMatch = 0;
-var totalMatches = 0;
-var matchesDisplay = undefined;
-var searchBox = undefined;
+let matchCase = false;
+let wholeWords = false;
+let searchString = '';
+let currentMatch = 0;
+let totalMatches = 0;
+let matchesDisplay = undefined;
+let searchBox = undefined;
 
 // passes a connection to content.js, which listens for us disconnecting
 // (i.e. closing) so it knows to clear any highlights on the page
 chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-    var port = chrome.tabs.connect(tabs[0].id, {name: 'disconnect-sender'});
+    chrome.tabs.connect(tabs[0].id, {name: 'disconnect-sender'});
 });
 
 // listen for keyboard shortcuts we defined as commands in the manifest
@@ -57,13 +57,13 @@ function onCommand(command) {
 
 // handle when find button is pressed (or Enter key)
 function onFindPressed(event) {
-    var textBox = document.getElementById('search-string');
+    let textBox = document.getElementById('search-string');
     searchString = textBox.value;
     if (!searchString || searchString.length === 0) {
         return;
     }
 
-    var searchParams = createSearch(searchString);
+    let searchParams = createSearch(searchString);
     doSearch(searchParams);
 
     // stop submission event here so form fields are not cleared/reset
@@ -87,7 +87,7 @@ function createSearch(searchString) {
 }
 
 // handles responses from content.js, containing latest current match and possibly a new total matches
-var updateMatchValues = function(response) {
+const updateMatchValues = function(response) {
     if (response) {
         currentMatch = response['current-match'];
 
@@ -95,12 +95,12 @@ var updateMatchValues = function(response) {
         if (response.hasOwnProperty('match-count')) {
             totalMatches = response['match-count'];
         }
-        updateMatchesDisplay(response);
+        updateMatchesDisplay();
     }
 };
 
 // updates the 'x of y matches' display when current or total matches changes
-function updateMatchesDisplay(response) {
+function updateMatchesDisplay() {
     if (currentMatch === 0 && totalMatches == 0) {
         matchesDisplay.textContent = 'No matches';
     }
@@ -119,9 +119,9 @@ function onRegexChange() {
 
 // called whenever content of the search box changes to launch a fresh search
 function onInputChange() {
-    var searchString = document.getElementById('search-string').value;
+    let searchString = document.getElementById('search-string').value;
     if (searchString) {
-        var searchParams = createSearch(searchString);
+        let searchParams = createSearch(searchString);
         doSearch(searchParams);
     }
     else {
@@ -141,7 +141,7 @@ function clearOldMatches() {
 
 // send a 'move' message to content.js to move to the next or previous match
 function moveMatch(command) {
-    var moveCommand = {
+    let moveCommand = {
         'type': 'move',
         'cmd': command
     };
@@ -165,11 +165,11 @@ function onMovePressed(event) {
 
 // set up event listeners and put cursor in input box
 function initialize() {
-    var matchCaseCheckbox = document.querySelector('#match-case');
+    let matchCaseCheckbox = document.querySelector('#match-case');
     matchCaseCheckbox.addEventListener('keydown', detectEnterKey);
     matchCaseCheckbox.addEventListener('change', onRegexChange);
 
-    var wholeWordsCheckbox = document.querySelector('#whole-words');
+    let wholeWordsCheckbox = document.querySelector('#whole-words');
     wholeWordsCheckbox.addEventListener('keydown', detectEnterKey);
     wholeWordsCheckbox.addEventListener('change', onRegexChange);
 
