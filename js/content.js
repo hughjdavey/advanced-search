@@ -82,7 +82,7 @@ function setCurrentMatch() {
     if (markedStrings.length > 0) {
         var currentMark = markedStrings[currentMatch];
         currentMark.className = 'current_match';
-        scrollToCurrentMatch(currentMark);
+        scrollToCurrentMatch();
     }
 }
 
@@ -206,9 +206,9 @@ Element.prototype.documentOffsetTop = function () {
     return this.offsetTop + ( this.offsetParent ? this.offsetParent.documentOffsetTop() : 0 );
 };
 
-// gets the top of the element we want to move to and subtracts hal;f of the window height
+// gets the top of the element we want to move to and subtracts half of the window height
 // taken from http://stackoverflow.com/questions/8922107/javascript-scrollintoview-middle-alignment && http://jsfiddle.net/ThinkingStiff/MJ69d/
-function scrollToCurrentMatch(currentMark) {
+function scrollToCurrentMatch() {
     var top = document.querySelectorAll('.current_match')[0].documentOffsetTop() - (window.innerHeight / 2 );
     window.scrollTo(0, top);
 }

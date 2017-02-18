@@ -25,6 +25,7 @@ var searchString = '';
 var currentMatch = 0;
 var totalMatches = 0;
 var matchesDisplay = undefined;
+var searchBox = undefined;
 
 // passes a connection to content.js, which listens for us disconnecting
 // (i.e. closing) so it knows to clear any highlights on the page
@@ -46,15 +47,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // handle keyboard shortcuts by passing them to content.js
 function onCommand(command) {
-    var moveCommand = {
-        'type': 'move',
-        'cmd': command
+    if (command === 'clear') {
+        clearOldMatches();
     }
-
-    // send forward or back command to content.js
-    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
-        chrome.tabs.sendMessage(tabs[0].id, moveCommand, updateMatchValues);
-    });
+    else {
+        moveMatch(command);
+    }
 }
 
 // handle when find button is pressed (or Enter key)
@@ -99,7 +97,7 @@ var updateMatchValues = function(response) {
         }
         updateMatchesDisplay(response);
     }
-}
+};
 
 // updates the 'x of y matches' display when current or total matches changes
 function updateMatchesDisplay(response) {
@@ -134,8 +132,22 @@ function onInputChange() {
 
 // send a 'clear' message to content.js so it clears old matches
 function clearOldMatches() {
+    searchBox.value = '';
+    matchesDisplay.textContent = 'No matches';
     chrome.tabs.query({active: true, currentWindow: true}, tabs => {
         chrome.tabs.sendMessage(tabs[0].id, { 'type' : 'clear' });
+    });
+}
+
+// send a 'move' message to content.js to move to the next or previous match
+function moveMatch(command) {
+    var moveCommand = {
+        'type': 'move',
+        'cmd': command
+    };
+
+    chrome.tabs.query({active: true, currentWindow: true}, tabs => {
+        chrome.tabs.sendMessage(tabs[0].id, moveCommand, updateMatchValues);
     });
 }
 
@@ -164,11 +176,12 @@ function initialize() {
     document.querySelector('#search-string').addEventListener('input', onInputChange);
     document.getElementById('find-on-page').addEventListener('submit', onFindPressed);
 
-    var searchBox = document.getElementById('search-string');
+    searchBox = document.getElementById('search-string');
     searchBox.focus();
 
     document.getElementById('next').addEventListener('click', onMovePressed);
     document.getElementById('previous').addEventListener('click', onMovePressed);
+    document.getElementById('clear').addEventListener('click', clearOldMatches);
 
     matchesDisplay = document.getElementById('matches-display');
     matchesDisplay.style.fontStyle = 'italic';

@@ -7,9 +7,7 @@
     "author": "hughjdavey@github.com",
 
     "permissions": [
-        "tabs",
-        "activeTab",
-        "<all_urls>"
+        "activeTab"
     ],
 
     "content_scripts": [{
@@ -41,10 +39,15 @@
             },
             "description": "Go to next match"
         },
+        "clear": {
+            "suggested_key": {
+                "default": "Ctrl+Delete"
+            },
+            "description": "Clear search results"
+        },
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+F",
-                "mac": "Command+Shift+F"
+                "default": "Ctrl+Shift+F"
             }
         }
     }

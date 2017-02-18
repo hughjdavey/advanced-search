@@ -53,3 +53,20 @@ button.text-button {
     font-size: 30px;
     margin: 0px;
 }
+
+/* for clear search button */
+div.align-right {
+    float: right;
+}
+
+/* for the keyboard shortcuts in the about page */
+pre {
+    display: inline;
+    padding: 0.25em 0.5em;
+    background-color: lightgrey;
+}
+
+/* so the keyboard shortcut padding does not go over text from other lines */
+ul {
+    line-height: 1.25em;
+}
