@@ -6,8 +6,8 @@ Searches are performed as you type, and there are regex options to further filte
 #### Usage
 
 * `Ctrl + Shift + F` or extension button to launch search dialog
-* `Ctrl + 🠆` or `🠆` button to go to next match
-* `Ctrl + 🠄` or `🠄` button to go to previous match
+* `Ctrl + →` or `→` button to go to next match
+* `Ctrl + ←` or `←` button to go to previous match
 * `Ctrl + Del` or `×` button to clear current search text and results
 
 #### Contributing

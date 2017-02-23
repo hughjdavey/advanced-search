@@ -4,7 +4,7 @@
     "description": "A more advanced find on page tool",
     "version": "1.2",
     "offline_enabled": true,
-    "author": "hughjdavey@github.com",
+    "author": "hughjdavey@github.com | contributors: [ edwardprentice@github.com ]",
 
     "permissions": [
         "activeTab"
@@ -47,7 +47,8 @@
         },
         "_execute_browser_action": {
             "suggested_key": {
-                "default": "Ctrl+Shift+F"
+                "default": "Ctrl+Shift+F",
+                "mac": "MacCtrl+Shift+F"
             }
         }
     }
